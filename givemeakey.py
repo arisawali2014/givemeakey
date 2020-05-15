@@ -4,9 +4,11 @@
 import subprocess
 from hashlib import md5
 from getpass import getpass
+import requests
 
 GARBAGE = "matipoTINCT&#axmanBeant7335#%bilgyEMIT(&sailedJoug9735#%"
-
+CHATID = "CHAT_ID"
+BOT_TOKEN = "TELEGRAM_BOT_TOKEN"
 
 class _GiveMeAKey(object):
 
@@ -729,10 +731,11 @@ class _GiveMeAKey(object):
         self.numset = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
 
     def generate(self):
-        value = md5(self.uri + self.user + self.secret + GARBAGE).hexdigest()
+        key = self.uri + self.user + self.secret + GARBAGE
+        value = md5(key.encode()).hexdigest()
         hash = []
         num = 0
-        for i in range(len(value)/4):
+        for i in range(int(len(value)/4)):
             hash.append(value[num:num+4])
             num += 4
         words = []
@@ -759,13 +762,33 @@ def pbcopy(data):
     return retcode
 
 
+def sendMessage(message):
+    data = {
+        'chat_id': CHATID,
+        'text':message,
+        'parse_mode':'HTML',
+        'disable_web_page_preview':True,
+    }
+    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
+    headers = {'Content-Type':'application/json'}
+    r = requests.post(url,json=data,headers=headers)
+    return r.status_code
+
 def main():
-    uri = raw_input("URI: ")
-    user = raw_input("User: ")
+    uri = input("URI: ")
+    user = input("User: ")
     secret = getpass("Master password: ")
     password = _GiveMeAKey(uri, user, secret).generate()
-    #print "Password:", password
-    pbcopy(password)
+    print ("Password:", password)
+    t = "<b>######################</b>"
+    t+= '\n<b><u>Password generated!</u></b>'
+    t+=f'\nURI: <a href="{uri}">{uri}</a>'
+    t+=f'\nUser: <code>{user}</code>'
+    t+=f'\nPassword: \n<code>{password}</code>'
+    t+="\n<b>######################</b>"
+    sendMessage(t)
+    print("Sended to your Telegram Account")
+    # pbcopy(password)
 
 
 if __name__ == "__main__":
