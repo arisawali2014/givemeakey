@@ -460,7 +460,6 @@ def sendMessage(message):
         'disable_web_page_preview':True,
     }
     url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
-    data = json.dumps(data)
     headers = {'Content-Type':'application/json'}
     r = requests.post(url,data,headers=headers)
     return r.status_code
